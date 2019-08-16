@@ -15,6 +15,16 @@ class Order {
 
     public $items;
 
+    public function __construct($id)
+    {
+        $this->id = $id;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
     public function getState()
     {
         return $this->state;
@@ -29,5 +39,25 @@ class Order {
             throw BadWorkflow::orderStateCanOnlyBeSetFromWorkflow($callerFunction);
         }
         $this->state = $state;
+    }
+
+    public function setItems(array $items)
+    {
+        $this->items = $items;
+    }
+
+    public function setCustomer(Customer $customer)
+    {
+        $this->customer = $customer;
+    }
+
+    public function setPicker(Picker $picker)
+    {
+        $this->picker = $picker;
+    }
+
+    public function getName()
+    {
+        return '#' . $this->id;
     }
 }

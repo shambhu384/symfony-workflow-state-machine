@@ -9,34 +9,57 @@ ini_set('display_startup_errors', "1");
 require __DIR__.'/vendor/autoload.php';
 
 use App\Order;
+use App\Product;
+use App\Customer;
+use App\Picker;
 use App\OrderWorkflow;
 use Symfony\Component\Workflow\Workflow;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use App\OrderWorkflowListener;
 
-$order = new Order();
-$orderWorkflow =  OrderWorkflow::getWorkflow();
+$order = new Order('1');
 
-transition($orderWorkflow, $order, OrderWorkflow::TRANSITION_UPDATE_ITEM);
+$dispatcher = new EventDispatcher();
 
-canTransitionToDelivered($orderWorkflow, $order);
+$listener = new OrderWorkflowListener();
+$dispatcher->addSubscriber($listener);
 
-transition($orderWorkflow, $order, OrderWorkflow::TRANSITION_CONFIRM_ORDER);
-
-canTransitionToDelivered($orderWorkflow, $order);
-
-transition($orderWorkflow, $order, OrderWorkflow::TRANSITION_ASSIGN_PICKER);
-
-canTransitionToDelivered($orderWorkflow, $order);
+$orderWorkflow =  OrderWorkflow::getWorkflow($dispatcher);
 
 
-function transition(Workflow $orderWorkflow, $order, string $transition) {
-    $orderWorkflow->apply($order, $transition);
-    echo ('transitioned to:' . $order->getState()). '<br/>';
+// Update Items
+$items = [];
+$items[] = new Product('Banana', '2');
+$items[] = new Product('Apple', '1.5');
+
+
+$transition = transition($orderWorkflow, $order, OrderWorkflow::TRANSITION_UPDATE_ITEM);
+
+if($transition) {
+    $order->setItems($items);
 }
 
-function canTransitionToDelivered(Workflow $orderWorkflow, Order $order): bool
-{
-    $canTransitionToDelivered = $orderWorkflow->can($order, OrderWorkflow::TRANSITION_CONFIRM_DELIVERY);
-    echo ('Can transition to delivered:'), var_dump($canTransitionToDelivered), '<br/>';
+$transition = transition($orderWorkflow, $order, OrderWorkflow::TRANSITION_UPDATE_ITEM);
 
-    return $canTransitionToDelivered;
+if($transition) {
+    $order->setCustomer(new Customer('Michelle'));
+}
+
+
+$transition = transition($orderWorkflow, $order, OrderWorkflow::TRANSITION_CONFIRM_ORDER);
+$transition = transition($orderWorkflow, $order, OrderWorkflow::TRANSITION_ASSIGN_PICKER);
+
+if ($transition) {
+    $order->setPicker(new Picker('Fruity Batman'));
+}
+
+function transition(Workflow $orderWorkflow, Order $order, string $transition) {
+
+    if (!$orderWorkflow->can($order, $transition)) {
+        return false;
+    }
+
+    $orderWorkflow->apply($order, $transition);
+
+    return true;
 }

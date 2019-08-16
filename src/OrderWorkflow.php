@@ -6,6 +6,7 @@ use Symfony\Component\Workflow\DefinitionBuilder;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class OrderWorkflow {
 
@@ -22,7 +23,7 @@ class OrderWorkflow {
     public const TRANSITION_CONFIRM_DELIVERY = 'confirmDelivery';
     public const TRANSITION_CANCEL_ORDER = 'cancelOrder';
 
-    public static function getWorkflow(): Workflow
+    public static function getWorkflow(EventDispatcher  $eventDispatcher): Workflow
     {
         $definitionBuilder = new DefinitionBuilder();
 
@@ -36,6 +37,6 @@ class OrderWorkflow {
             ->build()
         ;
         $making = new MethodMarkingStore(true, 'state');
-        return new Workflow($definition, $making);
+        return new Workflow($definition, $making, $eventDispatcher, 'order');
     }
 }
