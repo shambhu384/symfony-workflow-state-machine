@@ -1,29 +1,33 @@
 <?php
 
+namespace App;
+
+use App\Exception\BadWorkflow;
+use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
+
 class Order {
 
-    public const STATE_OPEN = 'open';
-    public const STATE_CONFIRMED = 'confirmed';
-    public const STATE_ASSIGNED_TO_PICKER = 'assigned-to-picker';
-    public const STATE_PICKED_UP = 'picked-up';
-    public const STATE_DELIVERED = 'delivered';
-    public const STATE_ABORTED_BY_CUSTOMER = 'cancelled';
-    public const STATE_CANCEKKED_BY_SYSTEM = 'cancelled-by-system';
+    public $state;
 
-    public const STATES = [
-        self::STATE_OPEN,
-        self::STATE_CONFIRMED,
-        self::STATE_ASSIGNED_TO_PICKER,
-        self::STATE_PICKED_UP,
-        self::STATE_DELIVERED,
-        self::STATE_ABORTED_BY_CUSTOMER,
-        self::STATE_CANCEKKED_BY_SYSTEM
-    ];
+    public $customer;
 
-    public const TRANSITION_UPDATE_ITEM = 'updateItem';
+    public $picker;
 
-    /**
-     * @var string
-     */
-    private $state = self::STATE_OPEN;
+    public $items;
+
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    public function setState($state)
+    {
+        $expectedClass = MethodMarkingStore::Class;
+        $callerFunction = debug_backtrace()[1]['class'] ?? debug_backtrace()[0]['class'] ?? '';
+
+        if($expectedClass !== $callerFunction) {
+            throw BadWorkflow::orderStateCanOnlyBeSetFromWorkflow($callerFunction);
+        }
+        $this->state = $state;
+    }
 }

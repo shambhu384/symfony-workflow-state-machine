@@ -5,6 +5,7 @@
         }
     },
     "require": {
-        "symfony/workflow": "^4.3"
+        "symfony/workflow": "^4.3",
+        "symfony/event-dispatcher": "^4.3"
     }
 }
