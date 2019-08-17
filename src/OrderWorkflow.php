@@ -25,6 +25,12 @@ class OrderWorkflow {
 
     public static function getWorkflow(EventDispatcher  $eventDispatcher): Workflow
     {
+        $making = new MethodMarkingStore(true, 'state');
+        return new Workflow(self::getDefinition(), $making, $eventDispatcher, 'orders');
+    }
+
+    public static function getDefinition()
+    {
         $definitionBuilder = new DefinitionBuilder();
 
         $definition = $definitionBuilder->addPlaces(['open', 'confirmed', 'assigned-to-picker', 'delivered', 'cancelled'])
@@ -36,7 +42,7 @@ class OrderWorkflow {
             ->addTransition(new Transition(self::TRANSITION_CANCEL_ORDER, [self::STATE_OPEN, self::STATE_CONFIRMED, self::STATE_ASSIGNED_TO_PICKER], self::STATE_CANCELLED))
             ->build()
         ;
-        $making = new MethodMarkingStore(true, 'state');
-        return new Workflow($definition, $making, $eventDispatcher, 'order');
+
+        return $definition;
     }
 }

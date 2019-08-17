@@ -16,6 +16,8 @@ use App\OrderWorkflow;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use App\OrderWorkflowListener;
+use Symfony\Component\Workflow\Dumper\StateMachineGraphvizDumper;
+use Symfony\Component\Workflow\Dumper\PlantUmlDumper;
 
 $order = new Order('1');
 
@@ -63,3 +65,12 @@ function transition(Workflow $orderWorkflow, Order $order, string $transition) {
 
     return true;
 }
+
+
+$dumper = new StateMachineGraphvizDumper);
+//$dumper = new PlantUmlDumper(PlantUmlDumper::STATEMACHINE_TRANSITION);
+$dumper = new PlantUmlDumper(PlantUmlDumper::WORKFLOW_TRANSITION);
+
+echo $dumper->dump(OrderWorkflow::getDefinition());
+
+
