@@ -1,2 +1,42 @@
 framework:
-    workflows: null
+    workflows:
+        order:
+            type: workflow
+            marking_store:
+                type: method
+            supports:
+                - App\Entity\Order
+            places:
+                open:
+                confirmed:
+                assigned:
+                delivered:
+                cancelled:
+            transitions:
+                updateItem:
+                    from: open
+                    to: open
+
+                assignCustomer:
+                    from: open
+                    to: open
+
+                confirmedOrder:
+                    from: open
+                    to:
+                        - confirmed
+
+                assignPicker:
+                    from: confirmed
+                    to:
+                        - assigned
+                confirmDelivey:
+                    from: assigned
+                    to: delivered
+
+                cancelOrder:
+                    from:
+                        - open
+                        - confirmed
+                        - assigned
+                    to: cancelled
