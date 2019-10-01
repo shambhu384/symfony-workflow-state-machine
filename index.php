@@ -8,11 +8,7 @@ ini_set('display_startup_errors', "1");
 
 require __DIR__.'/vendor/autoload.php';
 
-use App\Order;
-use App\Product;
-use App\Customer;
-use App\Picker;
-use App\OrderWorkflow;
+use App\{Order,Product,Customer,Picker,OrderWorkflow};
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use App\OrderWorkflowListener;
